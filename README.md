@@ -169,6 +169,14 @@ to generate a colored 3D representation of the surrounding environment.
 
 ---
 
+# Contributors
+
+Subiksha
+
+----
+
+---
+
 # License
 
 This project is licensed under the **MIT License**.
