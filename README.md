@@ -85,23 +85,6 @@ https://projects.csail.mit.edu/stata/downloads.html
 
 ---
 
-# Repository Structure
-
-```text
-3D-Semantic-Environment-Reconstruction-ROS
-│
-├── README.md
-├── setup.md
-├── requirements.txt
-├── LICENSE
-├── launch/
-├── scripts/
-├── config/
-├── docs/
-├── images/
-└── output/
-```
-
 ---
 # Quick Start
 
