@@ -1,0 +1,77 @@
+<launch>
+
+  <param name="use_sim_time" value="true"/>
+
+  <!-- BAG FILE -->
+  <node pkg="rosbag" type="play" name="rosbag_play"
+        args="--clock -r 0.5 /home/subiksha/bagfiles/2011-01-26-06-56-04.bag"
+        output="screen" required="true"/>
+
+  <!-- IMU FILTER -->
+  <node pkg="imu_filter_madgwick" type="imu_filter_node"
+        name="imu_filter" output="screen">
+    <remap from="imu/data_raw" to="/torso_lift_imu/data"/>
+    <param name="use_mag"       value="false"/>
+    <param name="publish_tf"    value="false"/>
+    <param name="world_frame"   value="enu"/>
+    <param name="output_frame"  value="imu_link"/>
+  </node>
+
+  <!-- LASER ASSEMBLER: accumulates 2D scans into 3D using robot motion -->
+  <node pkg="laser_assembler" type="laser_scan_assembler"
+        name="laser_assembler" output="screen">
+    <remap from="scan"         to="/base_scan"/>
+    <param name="max_scans"    value="500"/>
+    <param name="fixed_frame"  value="odom_combined"/>
+  </node>
+
+  <!-- CLOUD PUBLISHER: calls assembler service and publishes 3D cloud -->
+  <node pkg="mit_reconstruction" type="assemble_cloud_publisher.py"
+        name="assemble_cloud_publisher" output="screen"/>
+
+  <!-- RTAB-MAP: stereo + assembled 3D lidar cloud -->
+  <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap"
+        output="screen" args="--delete_db_on_start">
+
+    <param name="frame_id"                     value="base_footprint"/>
+    <param name="odom_frame_id"                value="odom_combined"/>
+    <param name="map_frame_id"                 value="map"/>
+
+    <param name="subscribe_stereo"             value="true"/>
+    <param name="subscribe_scan_cloud"         value="true"/>
+    <param name="approx_sync"                  value="true"/>
+    <param name="sync_queue_size"              value="100"/>
+    <param name="topic_queue_size"             value="100"/>
+    <param name="approx_sync_max_interval"     value="2.0"/>
+
+    <remap from="odom"               to="/robot_pose_ekf/odom_combined"/>
+    <remap from="scan_cloud"         to="/assembled_cloud"/>
+    <remap from="left/image_rect"    to="/wide_stereo/left/image_rect"/>
+    <remap from="right/image_rect"   to="/wide_stereo/right/image_rect"/>
+    <remap from="left/camera_info"   to="/wide_stereo/left/camera_info"/>
+    <remap from="right/camera_info"  to="/wide_stereo/right/camera_info"/>
+
+    <param name="RGBD/NeighborLinkRefining"        value="true"/>
+    <param name="RGBD/ProximityBySpace"            value="true"/>
+    <param name="RGBD/ProximityMaxGraphDepth"      value="0"/>
+    <param name="RGBD/ProximityPathMaxNeighbors"   value="1"/>
+    <param name="Reg/Strategy"                     value="1"/>
+    <param name="Reg/Force3DoF"                    value="false"/>
+    <param name="Grid/3D"                          value="true"/>
+    <param name="Grid/NormalsSegmentation"         value="false"/>
+    <param name="Grid/RangeMax"                    value="10.0"/>
+    <param name="Grid/Sensor"                      value="1"/>
+    <param name="Icp/VoxelSize"                    value="0.05"/>
+    <param name="Icp/MaxCorrespondenceDistance"    value="0.5"/>
+    <param name="Icp/PointToPlane"                 value="true"/>
+    <param name="Vis/MinInliers"                   value="10"/>
+    <param name="Mem/STMSize"                      value="30"/>
+    <param name="Kp/MaxFeatures"                   value="500"/>
+  </node>
+
+  <!-- RVIZ -->
+  <node pkg="rviz" type="rviz" name="rviz"
+        args="-d $(find rtabmap_launch)/launch/config/rgbd.rviz"
+        output="screen"/>
+
+</launch>
