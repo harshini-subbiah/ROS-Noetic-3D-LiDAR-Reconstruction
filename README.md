@@ -159,8 +159,6 @@ to generate a colored 3D representation of the surrounding environment.
 
 Subiksha
 
-----
-
 ---
 
 # License
