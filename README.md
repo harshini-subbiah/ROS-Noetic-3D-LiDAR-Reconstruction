@@ -84,8 +84,6 @@ https://projects.csail.mit.edu/stata/downloads.html
 - Laser Assembler
 
 ---
-
----
 # Quick Start
 
 After completing the installation described in **setup.md**, run the project as follows.
