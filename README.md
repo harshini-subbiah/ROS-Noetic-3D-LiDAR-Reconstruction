@@ -145,18 +145,6 @@ to generate a colored 3D representation of the surrounding environment.
 
 ---
 
-# Future Improvements
-
-- ROS 2 Migration
-- Real-time SLAM
-- GPU Acceleration
-- Deep Learning-based Semantic Segmentation
-- OctoMap Integration
-- Mesh Reconstruction
-- Multi-session Mapping
-
----
-
 # Acknowledgements
 
 - MIT CSAIL STATA Center Dataset
